@@ -4,13 +4,16 @@ import (
 	"compress/zlib"
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 // Usage: your_git.sh <command> <arg1> <arg2> ...
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	fmt.Println("Logs from your program will appear here!")
+	// fmt.Println("Logs from your program will appear here!")
 
 	if len(os.Args) < 2 {
 		fmt.Fprintf(os.Stderr, "usage: mygit <command> [<args>...]\n")
@@ -36,14 +39,23 @@ func main() {
 		switch opt {
 		case "-p":
 			blobsha := os.Args[3]
-			fpath := fmt.Sprintf(".git/objects/%s/%s", blobsha[0:2], blobsha[2:])
+			fpath := filepath.Join(".git/objects", blobsha[:2], blobsha[2:])
 			f, err := os.Open(fpath)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error opening .git/objects/%s/%s: %s\n", blobsha[0:2], blobsha[2:], err)
+				fmt.Fprintf(os.Stderr, "Error opening %s: %s\n", fpath, err)
 				os.Exit(1)
 			}
-			a, _ := zlib.NewReader(f)
-			io.ReadAll(a)
+			a, err := zlib.NewReader(f)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer a.Close()
+
+			b, err := io.ReadAll(a)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(strings.Split(string(b), "\x00")[1])
 
 		default:
 			fmt.Fprintf(os.Stderr, "Unknown command %s\n", command)
