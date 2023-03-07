@@ -1,7 +1,9 @@
 package main
 
 import (
+	"compress/zlib"
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -29,6 +31,24 @@ func main() {
 		}
 
 		fmt.Println("Initialized git directory")
+	case "cat-file":
+		opt := os.Args[2]
+		switch opt {
+		case "-p":
+			blobsha := os.Args[3]
+			fpath := fmt.Sprintf(".git/objects/%s/%s", blobsha[0:2], blobsha[2:])
+			f, err := os.Open(fpath)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error opening .git/objects/%s/%s: %s\n", blobsha[0:2], blobsha[2:], err)
+				os.Exit(1)
+			}
+			a, _ := zlib.NewReader(f)
+			io.ReadAll(a)
+
+		default:
+			fmt.Fprintf(os.Stderr, "Unknown command %s\n", command)
+			os.Exit(1)
+		}
 
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown command %s\n", command)
