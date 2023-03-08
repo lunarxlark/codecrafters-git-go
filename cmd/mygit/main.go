@@ -32,8 +32,8 @@ func main() {
 		if err := os.WriteFile(".git/HEAD", headFileContents, 0644); err != nil {
 			fmt.Fprintf(os.Stderr, "Error writing file: %s\n", err)
 		}
-
 		fmt.Println("Initialized git directory")
+
 	case "cat-file":
 		opt := os.Args[2]
 		switch opt {
@@ -45,16 +45,13 @@ func main() {
 				fmt.Fprintf(os.Stderr, "Error opening %s: %s\n", fpath, err)
 				os.Exit(1)
 			}
-			a, err := zlib.NewReader(f)
+			zr, err := zlib.NewReader(f)
 			if err != nil {
 				log.Fatal(err)
 			}
-			defer a.Close()
+			defer zr.Close()
 
-			b, err := io.ReadAll(a)
-			if err != nil {
-				log.Fatal(err)
-			}
+			b, _ := io.ReadAll(zr)
 			fmt.Println(strings.Split(string(b), "\x00")[1])
 
 		default:
