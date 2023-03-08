@@ -64,11 +64,11 @@ func main() {
 		switch opt {
 		case "-w":
 			fname := os.Args[3]
-			fmt.Println(fname)
 			digest := sha1.New()
 			digest.Write([]byte(fname))
+			// a := hex.EncodeToString(digest.Sum([]byte(fname)))
 			a := hex.EncodeToString(digest.Sum(nil))
-			fmt.Println(a)
+			fmt.Printf(a)
 
 		default:
 			fmt.Fprintf(os.Stderr, "Unknown command %s\n", command)
