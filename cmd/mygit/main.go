@@ -10,8 +10,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"golang.org/x/crypto/sha3"
 )
 
 // Usage: your_git.sh <command> <arg1> <arg2> ...
