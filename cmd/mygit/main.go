@@ -52,7 +52,7 @@ func main() {
 			defer zr.Close()
 
 			b, _ := io.ReadAll(zr)
-			fmt.Println(strings.Split(string(b), "\x00")[1])
+			fmt.Print(strings.Split(string(b), "\x00")[1])
 
 		default:
 			fmt.Fprintf(os.Stderr, "Unknown command %s\n", command)
