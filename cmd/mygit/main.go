@@ -2,18 +2,20 @@ package main
 
 import (
 	"compress/zlib"
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/crypto/sha3"
 )
 
 // Usage: your_git.sh <command> <arg1> <arg2> ...
 func main() {
-	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	// fmt.Println("Logs from your program will appear here!")
 
 	if len(os.Args) < 2 {
 		fmt.Fprintf(os.Stderr, "usage: mygit <command> [<args>...]\n")
@@ -53,6 +55,22 @@ func main() {
 
 			b, _ := io.ReadAll(zr)
 			fmt.Print(strings.Split(string(b), "\x00")[1])
+
+		default:
+			fmt.Fprintf(os.Stderr, "Unknown command %s\n", command)
+			os.Exit(1)
+		}
+
+	case "hash-object":
+		opt := os.Args[2]
+		switch opt {
+		case "-w":
+			fname := os.Args[3]
+			fmt.Println(fname)
+			digest := sha1.New()
+			digest.Write([]byte(fname))
+			a := hex.EncodeToString(digest.Sum(nil))
+			fmt.Println(a)
 
 		default:
 			fmt.Fprintf(os.Stderr, "Unknown command %s\n", command)
